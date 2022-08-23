@@ -1,0 +1,65 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Phòng của tôi{% endblock %}
+
+{% block content %}
+<h1 class="text-center">Phòng của tôi</h1>
+
+{% if 'booking' in session and session['booking'] %}
+
+<table class="table">
+    <tr >
+        <th>Mã Phòng</th>
+        <th>Tên Phòng</th>
+        <th>Giá Phòng</th>
+        <th>Số phòng</th>
+        <th></th>
+    </tr>
+    {% for b in session['booking'].values() %}
+    <tr id="room{{ b.id }}">
+        <td>{{ b.id }}</td>
+        <td>{{ b.name }}</td>
+        <td>{{ b.price }}</td>
+        <td>
+            <div class="form-group">
+                <input type="number" min="1"
+                       onblur="updateBooking({{ b.id }}, this)"
+                       value="{{ b.quantity }}" class="form-control">
+            </div>
+        </td>
+        <td>
+            <input type="button" onclick="deleteBooking({{ b.id }})" value="Xoa" class="btn btn-danger">
+        </td>
+
+    </tr>
+    {% endfor %}
+</table>
+
+<div class="alert alert-info">
+    <h4>Tổng số phòng: <span class="booking-counter">{{ count.total_quantity }}</span></h4>
+    <h4>Tổng tiền: <span id="total-amount">{{ "{:,.1f}".format(count.total_amount) }}</span> $</h4>
+</div>
+
+{% for s in show_booking  %}
+<div>
+    <h4>Ngày nhận phòng: {{ s[0] }}</h4>
+</div>
+<div>
+    <h4>Ngày trả phòng: {{ s[1] }}</h4>
+</div>
+{% endfor %}
+
+{% if current_user.is_authenticated %}
+<h4>Xác nhận thông tin đặt phòng  <a href="{{ url_for('reservation') }}">tại đây</a></h4>
+<br>
+<input type="button" value="Thanh Toán" class="btn btn-success" onclick="pay()">
+{% else %}
+<h4>Bạn cần đăng nhập để thanh toán <a href="{{ url_for('user_signin', next='booking') }}">Đăng nhập ngay</a></h4>
+{% endif %}
+<hr>
+
+{% else %}
+<p class="text-danger">Chưa có phòng nào đã đặt</p>
+{% endif %}
+
+{% endblock %}

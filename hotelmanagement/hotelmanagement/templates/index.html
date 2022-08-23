@@ -1,0 +1,31 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Trang chủ{% endblock %}
+
+{% block content %}
+        <h1 class="subject">Chào mừng các bạn đến website đặt phòng trực tuyến</h1>
+        {% if rooms %}
+        <form class="form-inline" >
+          <input type="text" class="form-control" placeholder="From Price" name="from_price"><br>
+          <input type="text" class="form-control" placeholder="To Price" name="to_price" >
+          <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+        </form>
+        <div class="row">
+            {% for r in rooms %}
+            <div class="col-md-4 col-xs-12" style="padding:5px">
+                <div class="card" style="padding:5px">
+                  <img class="card-img-top" src="{{ url_for('static', filename=r.image) }}" alt="{{ r.name }}">
+                  <div class="card-body">
+                    <h4 class="card-title">{{ r.name }} <p class="text-primary">ID:{{ r.id }}</p></h4>
+                    <p class="card-text">{{ "{:,.1f}".format(r.price) }} $</p>
+                    <a href="#" class="btn btn-primary" onclick="addToBooking({{ r.id }}, '{{ r.name }}', {{ r.price }})">Đặt Phòng</a>
+                    <a href="{{ url_for('room_details', room_id=r.id) }}" class="btn btn-info">Xem chi tiết</a>
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p><i>Không có sản phẩm nào</i></p>
+        {% endif %}
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'admin/base.html' %}
+
+{% block body %}
+{% if current_user.is_authenticated %}
+<h1 style="center">WELCOME {{ current_user.name }} </h1>
+<div class="col-md-5 col-xs-12">
+        <form>
+            <div class="form-group">
+                <input name="month" type="number" min="1"  max="12" class="form-control" placeholder="Nhập tháng"/>
+            </div>
+            <input type="submit" value="Thống kê" class="btn btn-danger">
+        </form>
+        <canvas id="productMonthChartId"></canvas>
+    </div>
+<div class="row">
+    <div class="col-md-6 col-xs-12">
+        <table class="table">
+            <tr>
+                <th>Loại phòng</th>
+                <th>Tên phòng</th>
+                <th>Doanh thu</th>
+                <th>Số lượt thuê</th>
+                <th>Tỷ lệ</th>
+            </tr>
+            {% for s in stats  %}
+            <tr>
+                <td>{{ s[0] }}</td>
+                <td>{{ s[1] }}</td>
+                <td>{{ s[2] }}</td>
+                <td>{{ s[3] }}</td>
+                <td>{{ s[4] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <hr>
+        {% for s in statss %}
+        <a>Tổng doanh thu: {{ "{:,.1f}".format(s[1]) }} $</a>
+        {% endfor %}
+
+    </div>
+    <div class="col-md-6 col-xs-12">
+         <canvas id="myCategoryChart"></canvas>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+       let labels = []
+       let data = []
+       let colors = []
+       let borderColor = []
+       let r,g,b;
+
+
+       {% for s in stats %}
+            labels.push('{{ s[1] }}')
+            data.push({{ s[2] }})
+
+            r = Math.random()*255
+            g = Math.random()*255
+            b = Math.random()*255
+
+            colors.push(`rgba(${r}, ${g}, ${b} , 0.2)`)
+            borderColor.push(`rgba(${r}, ${g}, ${b} , 1)`)
+       {% endfor %}
+       window.onload = function() {
+            const ctx = document.getElementById('myCategoryChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Thong ke so san pham theo danh muc',
+                    data: data,
+                    backgroundColor:colors,
+                    borderColor: borderColor,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+       }
+</script>
+{% else %}
+<h1 class="text-center text danger">ĐĂNG NHẬP QUẢN TRỊ VIÊN</h1>
+{% with messages = get_flashed_messages() %}
+{% endwith %}
+<form method="post" action="{{ url_for('signin_admin') }}" >
+     <div class="form-group">
+        <label for="username" >Tài khoản</label>
+        <input type="text" class="form-control" placeholder="Nhập username..." id="username" name="username" required/>
+    </div>
+     <div class="form-group">
+        <label for="pass" >Mật khẩu</label>
+        <input type="password" class="form-control" placeholder="Nhập mật khẩu..." id="pass" name="password"/>
+    </div>
+     <input type="submit" value="Đăng nhập" class="btn btn-danger" />
+ </form>
+
+{% endif %}
+{% endblock %}
